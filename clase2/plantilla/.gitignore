@@ -1,0 +1,25 @@
+# Directorio local de plugins y módulos
+.terraform/
+
+# Lock file: en este laboratorio lo ignoramos para simplificar.
+# En proyectos reales suele versionarse.
+.terraform.lock.hcl
+
+# Archivos de estado (nunca subirlos a Git)
+*.tfstate
+*.tfstate.*
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Valores reales de variables (pueden contener datos sensibles)
+*.tfvars
+*.tfvars.json
+!terraform.tfvars.example
+
+# Overrides locales
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
