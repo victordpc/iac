@@ -1,0 +1,30 @@
+# La etapa .pre de GitLab corre antes que el resto del pipeline.
+# En CI el formateo solo comprueba: si algún .tf no está canónico, el job falla.
+# En local se corrige con el mismo comando, sin -check: terraform fmt -recursive
+
+stages:
+  - .pre
+
+terraform-fmt:
+  stage: .pre
+  image: debian:bookworm-slim
+  variables:
+    DEBIAN_FRONTEND: noninteractive
+    TERRAFORM_VERSION: "1.15.9"
+  before_script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends ca-certificates curl unzip
+    - |
+      case "$(dpkg --print-architecture)" in
+        amd64) ARCH=amd64 ;;
+        arm64) ARCH=arm64 ;;
+        *) echo "Arquitectura no contemplada: $(dpkg --print-architecture)" >&2; exit 1 ;;
+      esac
+      curl -fsSL -o /tmp/terraform.zip \
+        "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${ARCH}.zip"
+      unzip -o /tmp/terraform.zip -d /usr/local/bin
+      chmod 755 /usr/local/bin/terraform
+      rm -f /tmp/terraform.zip
+      terraform version
+  script:
+    - terraform fmt -check -diff -recursive
